@@ -14,6 +14,7 @@ resource "azurerm_resource_group" "bhaskar-rg" {
 resource "azurerm_resource_group_template_deployment" "deploy" {
   name                = "deploy"
   resource_group_name = azurerm_resource_group.bhaskar-rg.name
+  template_body = file("${path.module}/deploymentTemplate.json")
 
    template_content = <<TEMPLATE
 {
