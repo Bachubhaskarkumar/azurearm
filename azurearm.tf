@@ -47,6 +47,7 @@ resource "azurerm_template_deployment" "example" {
   parameters = {
     adminUsername = "adminuser"
     adminPassword = "P@ssw0rd123!"  # Store this secret in Jenkins or use another secure method
+    subnetId = "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
   }
   template_body       = <<TEMPLATE
 {
