@@ -76,6 +76,7 @@ template_content     = <<TEMPLATE
     },
     "subnetId": {
         "type": "string",
+        "defaultValue": "",
         "metadata": {
             "description": "ID of the subnet."
         }
