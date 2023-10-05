@@ -5,13 +5,13 @@ provider "azurerm" {
 
 # Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = "myResourceGroup"
+  name     = "mybhaskar"
   location = "East US"
 }
 
 # Create an Azure Key Vault to store secrets
 resource "azurerm_key_vault" "example" {
-  name                       = "mykeyvault"
+  name                       = "bhaskar"
   location                   = azurerm_resource_group.example.location
   resource_group_name        = azurerm_resource_group.example.name
   sku_name                   = "standard"
@@ -23,14 +23,14 @@ resource "azurerm_key_vault" "example" {
 
 # Store Azure Service Principal credentials in Key Vault
 resource "azurerm_key_vault_secret" "sp_credentials" {
-  name         = "sp-credentials"
-  value        = "azurecredentials"  # Store this secret in Jenkins or use another secure method
+  name         = "azure-credentials"
+  value        = "azurecredential"  # Store this secret in Jenkins or use another secure method
   key_vault_id = azurerm_key_vault.example.id
 }
 
 # Define your virtual machine configuration using ARM templates
 resource "azurerm_template_deployment" "example" {
-  name                = "example-deployment"
+  name                = "bhaskar-deployment"
   resource_group_name = azurerm_resource_group.example.name
   #template_content    = file("arm-template.json")  # Path to your ARM template file
   deployment_mode     = "Incremental"
