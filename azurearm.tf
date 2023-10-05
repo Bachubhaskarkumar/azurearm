@@ -164,9 +164,4 @@ resource "azurerm_template_deployment" "example" {
   "outputs": {}
 }
   TEMPLATE
-
-  parameters = {
-    adminUsername = data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]
-    adminPassword = data.azurerm_key_vault_secret.vm_credentials.value["adminPassword"]
-  }
 }
