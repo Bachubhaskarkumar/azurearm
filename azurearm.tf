@@ -34,6 +34,10 @@ resource "azurerm_template_deployment" "example" {
   resource_group_name = azurerm_resource_group.example.name
   #template_content    = file("arm-template.json")  # Path to your ARM template file
   deployment_mode     = "Incremental"
+  parameters = {
+    adminUsername = "adminuser"
+    adminPassword = "P@ssw0rd123!"  # Store this secret in Jenkins or use another secure method
+  }
   template_body       = <<TEMPLATE
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
