@@ -168,7 +168,7 @@ TEMPLATE
 
 parameters_content = jsondecode({
     "secret" = {
-        value = azurerm_key_vault_secret.secret.value
+        value = azurerm_key_vault_secret.vm_credentials.value
         }
   })
 }
