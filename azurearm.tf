@@ -41,7 +41,8 @@ resource "azurerm_key_vault_secret" "sp_credentials" {
 }
 
 # Define your virtual machine configuration using ARM templates
-resource "azurerm_template_deployment" "example" {
+#resource "azurerm_template_deployment" "example" {
+resource "azurerm_resource_group_template_deployment" "example" {
   name                = "bhaskar-deployment"
   resource_group_name = azurerm_resource_group.example.name
   #template_content    = file("arm-template.json")  # Path to your ARM template file
@@ -51,8 +52,8 @@ resource "azurerm_template_deployment" "example" {
     adminPassword = "P@ssw0rd123!"  # Store this secret in Jenkins or use another secure method
     subnetId = "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
   }
-   template_body       = <<DEPLOY
-  #template_body       = <<TEMPLATE
+  #template_body       = <<DEPLOY
+  template_content     = <<TEMPLATE
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
@@ -139,10 +140,10 @@ resource "azurerm_template_deployment" "example" {
     }
   }
 }
-DEPLOY
-#TEMPLATE
+#DEPLOY
+TEMPLATE
 }
 # Output the public IP address of the VM
 output "public_ip" {
-  value = azurerm_template_deployment.example.outputs["adminUsername"]
+  value = azurerm_resource_group_template_deployment.example.outputs["adminUsername"]
 }
