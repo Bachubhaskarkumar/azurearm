@@ -67,6 +67,9 @@ resource "azurerm_template_deployment" "example" {
         "description": "Administrator password for the VM."
       }
     }
+    "subnetId": {
+      "type": "string"
+     }
   },
   "resources": [
     {
