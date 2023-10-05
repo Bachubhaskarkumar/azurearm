@@ -51,7 +51,6 @@ resource "azurerm_resource_group_template_deployment" "example" {
     adminPassword = "P@ssw0rd123!"  # Store this secret in Jenkins or use another secure method
     subnetId = "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
   })
-  Copy code
 template_content     = <<TEMPLATE
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
