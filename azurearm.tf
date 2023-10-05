@@ -26,7 +26,7 @@ resource "azurerm_template_deployment" "example" {
     "adminPassword": {
       "type": "securestring",
       "metadata": {
-        "description": "bhaskar"
+        "description": "bhaskar@123"
       }
     },
     "vmName": {
@@ -163,7 +163,7 @@ TEMPLATE
 
   parameters = {
     adminUsername = data.azurerm_key_vault_secret.vm_credentials.value["bhaskar"]
-    adminPassword = data.azurerm_key_vault_secret.vm_credentials.value["bhaskar"]
+    adminPassword = data.azurerm_key_vault_secret.vm_credentials.value["bhaskar@123"]
     vmName        = "bhaskar"  # You can specify the VM name here
   }
 }
