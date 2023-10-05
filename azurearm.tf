@@ -2,6 +2,11 @@ provider "azurerm" {
   features {}
 }
 
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "East US"  # Change this to your desired location
+}
+
 data "azurerm_key_vault_secret" "vm_credentials" {
   name         = "vm-credentials"  # Name of the secret in Azure Key Vault
   key_vault_id = "/subscriptions/<subscription_id>/resourceGroups/<resource_group>/providers/Microsoft.KeyVault/vaults/<key_vault_name>"
