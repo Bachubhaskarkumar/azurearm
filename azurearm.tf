@@ -1,174 +1,178 @@
-provider "azurerm" {
-  features {}
+resource "azurerm_resource_group" "bhaskar-rg" {
+  name     = "bhaskar-rg"
+  location = "EAST US"
 }
+resource "azurerm_resource_group_template_deployment" "deploy" {
+  name                = "deploy"
+  resource_group_name = azurerm_resource_group.bhaskar-rg.name
 
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
-  location = "East US"  # Change this to your desired location
-}
-
-data "azurerm_key_vault_secret" "vm_credentials" {
-  name         = "vm-credentials"  # Name of the secret in Azure Key Vault
-  key_vault_id = "/subscriptions/<subscription_id>/resourceGroups/<resource_group>/providers/Microsoft.KeyVault/vaults/<key_vault_name>"
-}
-
-resource "azurerm_template_deployment" "example" {
-  name                = "example-deployment"
-  resource_group_name = azurerm_resource_group.example.name
-  deployment_mode     = "Incremental"
-  template_body = <<TEMPLATE
+   template_content = <<TEMPLATE
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "adminUsername": {
-      "type": "string",
-      "metadata": {
-        "description": "Username for the Virtual Machine."
-      }
-    },
-    "adminPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Password for the Virtual Machine."
-      }
-    },
-    "vmName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the Virtual Machine."
-      }
-    }
-  },
-  "variables": {
-    "location": "[resourceGroup().location]",
-    "nicName": "[concat(parameters('vmName'), '-nic')]",
-    "osDiskName": "[concat(parameters('vmName'), '-osdisk')]",
-    "vnetName": "[concat(parameters('vmName'), '-vnet')]",
-    "subnetName": "[concat(parameters('vmName'), '-subnet')]",
-    "publicIPAddressName": "[concat(parameters('vmName'), '-ip')]",
-    "networkSecurityGroupName": "[concat(parameters('vmName'), '-nsg')]",
-    "diagnosticsStorageAccountName": "[concat('diag', uniquestring(resourceGroup().id))]"
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2020-11-01",
-      "name": "[variables('publicIPAddressName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "publicIPAllocationMethod": "Dynamic"
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2021-02-01",
-      "name": "[variables('networkSecurityGroupName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "securityRules": []
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2021-02-01",
-      "name": "[variables('vnetName')]",
-      "location": "[variables('location')]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": ["10.0.0.0/16"]
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Network/virtualNetworks/subnets",
-      "apiVersion": "2021-02-01",
-      "name": "[concat(variables('vnetName'), '/default')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
-      ],
-      "properties": {
-        "addressPrefix": "10.0.0.0/24",
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2021-02-01",
-      "name": "[variables('nicName')]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), 'default')]"
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+            "name": "vnet",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
+            "location": "EAST US",
             "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
-              },
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), 'default')]"
-              }
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "SubnetA",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg')]"
+                              }
+                        }
+                    }
+                ]
             }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2022-03-01",
-      "name": "[parameters('vmName')]",
-      "location": "[variables('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
-        "[resourceId('Microsoft.Compute/disks', variables('osDiskName'))]"
-      ],
-      "properties": {
-        "hardwareProfile": {
-          "vmSize": "Standard_DS2_v2"
         },
-        "osProfile": {
-          "computerName": bhaskar
-          "adminUsername": admin
-          "adminPassword": "[parameters('secret')]"
-        },
-        "storageProfile": {
-          "imageReference": {
-            "publisher": "Canonical",
-            "offer": "UbuntuServer",
-            "sku": "18.04-LTS",
-            "version": "latest"
-          },
-          "osDisk": {
-            "name": "[variables('osDiskName')]",
-            "createOption": "FromImage",
-            "caching": "ReadWrite"
-          }
-        },
-        "networkProfile": {
-          "networkInterfaces": [
+        {
+            "name": "public-ip",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "EAST US",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+                }
+            },
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+                "name": "nic",
+                "type": "Microsoft.Network/networkInterfaces",
+                "apiVersion": "2020-11-01",
+                "location": "EAST US",            
+                "properties": {
+                    "ipConfigurations": [
+                        {
+                            "name": "ipConfig",
+                            "properties": {
+                                "privateIPAllocationMethod": "Dynamic",
+                                "publicIPAddress": {
+                                    "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'public-ip')]"
+                                  },
+                                "subnet": {
+                                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet', 'SubnetA')]"
+                                }
+                            }
+                        }
+                    ]
+                },
+                "dependsOn": [
+                    "[resourceId('Microsoft.Network/publicIPAddresses', 'public-ip')]",
+                    "[resourceId('Microsoft.Network/virtualNetworks', 'vnet')]"
+                ]
             }
-          ]
+        },        
+        {
+            "name": "harsha1512",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2"
+        },
+        {
+            "name": "nsg",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow-RDP",
+                        "properties": {
+                            "description": "description",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "vm",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', toLower('harsha1512'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2s_v3"
+                },
+                "osProfile": {
+                    "computerName": "vm",
+                    "adminUsername": "demousr",
+                    "adminPassword": "[parameters('secret')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "windowsVM1OSDisk",
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                        {
+                            "name":"vm-data-disk",
+                            "diskSizeGB":16,
+                            "createOption": "Empty",
+                            "lun":0
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'nic')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', toLower('harsha1512'))).primaryEndpoints.blob]"
+                    }
+                }
+            }
         }
-      }
-    }
-  ],
-#  "outputs": {}
- 
+    },
+    "outputs": {},
 }
 TEMPLATE
 
-parameters_content = jsondecode({
+  # these key-value pairs are passed into the ARM Template's `parameters` block
+  
+  parameters_content = jsondecode({
     "secret" = {
-        value = azurerm_key_vault_secret.vm_credentials.value
+        value = azurerm_key_vault_secret.secret.value
         }
   })
+
+  deployment_mode = "Incremental"
 }
