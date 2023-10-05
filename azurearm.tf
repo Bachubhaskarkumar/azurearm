@@ -75,9 +75,12 @@ template_content     = <<TEMPLATE
       }
     },
     "subnetId": {
-      "type": "string"
+        "type": "string",
+        "metadata": {
+            "description": "ID of the subnet."
+        }
     }
-  },
+},
   "resources": [
     {
       "type": "Microsoft.Compute/virtualMachines",
