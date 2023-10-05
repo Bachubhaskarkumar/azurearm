@@ -19,7 +19,6 @@ resource "azurerm_key_vault" "example" {
   enabled_for_disk_encryption = true
   enabled_for_template_deployment = true
   enabled_for_deployment       = true
-  enabled_for_visual_studio    = true
 }
 
 # Store Azure Service Principal credentials in Key Vault
