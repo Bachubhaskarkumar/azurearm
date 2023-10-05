@@ -26,7 +26,8 @@ resource "azurerm_key_vault" "example" {
       "Get",
       "Set",
       "Delete",
-      "Recover"
+      "Recover",
+      "Purge"
     ]
   }
 }
