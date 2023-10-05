@@ -2,6 +2,11 @@ provider "azurerm" {
   features {}
 }
 
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
+  location = "East US"  # Change this to your desired location
+}
+
 data "azurerm_key_vault_secret" "vm_credentials" {
   name         = "vm-credentials"  # Name of the secret in Azure Key Vault
   key_vault_id = "/subscriptions/<subscription_id>/resourceGroups/<resource_group>/providers/Microsoft.KeyVault/vaults/<key_vault_name>"
@@ -11,7 +16,6 @@ resource "azurerm_template_deployment" "example" {
   name                = "example-deployment"
   resource_group_name = azurerm_resource_group.example.name
   deployment_mode     = "Incremental"
-
   template_body = <<TEMPLATE
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
