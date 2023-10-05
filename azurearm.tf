@@ -47,10 +47,16 @@ resource "azurerm_resource_group_template_deployment" "example" {
   #template_content    = file("arm-template.json")  # Path to your ARM template file
   deployment_mode     = "Incremental"
   parameters_content = jsonencode({
-    adminUsername = "adminuser"
-    adminPassword = "adminuser"  # Store this secret in Jenkins or use another secure method
-    subnetId = "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
-  })
+  "adminUsername": {
+    "value": "adminuser"
+  },
+  "adminPassword": {
+    "value": "P@ssw0rd123!"
+  },
+  "subnetId": {
+    "value": "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
+  }
+})
 template_content     = <<TEMPLATE
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json",
