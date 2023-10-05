@@ -51,7 +51,7 @@ resource "azurerm_template_deployment" "example" {
     adminPassword = "P@ssw0rd123!"  # Store this secret in Jenkins or use another secure method
     subnetId = "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
   }
-   template_body       = <<EOT
+   template_body       = <<DEPLOY
   #template_body       = <<TEMPLATE
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -139,7 +139,7 @@ resource "azurerm_template_deployment" "example" {
     }
   }
 }
-EOT
+DEPLOY
 #TEMPLATE
 }
 # Output the public IP address of the VM
