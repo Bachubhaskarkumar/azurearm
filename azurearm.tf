@@ -16,15 +16,34 @@ resource "azurerm_template_deployment" "example" {
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {},
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username for the Virtual Machine."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the Virtual Machine."
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Virtual Machine."
+      }
+    }
+  },
   "variables": {
     "location": "[resourceGroup().location]",
-    "nicName": "[concat(${data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]}, '-nic')]",
-    "osDiskName": "[concat(${data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]}, '-osdisk')]",
-    "vnetName": "[concat(${data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]}, '-vnet')]",
-    "subnetName": "[concat(${data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]}, '-subnet')]",
-    "publicIPAddressName": "[concat(${data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]}, '-ip')]",
-    "networkSecurityGroupName": "[concat(${data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]}, '-nsg')]",
+    "nicName": "[concat(parameters('vmName'), '-nic')]",
+    "osDiskName": "[concat(parameters('vmName'), '-osdisk')]",
+    "vnetName": "[concat(parameters('vmName'), '-vnet')]",
+    "subnetName": "[concat(parameters('vmName'), '-subnet')]",
+    "publicIPAddressName": "[concat(parameters('vmName'), '-ip')]",
+    "networkSecurityGroupName": "[concat(parameters('vmName'), '-nsg')]",
     "diagnosticsStorageAccountName": "[concat('diag', uniquestring(resourceGroup().id))]"
   },
   "resources": [
@@ -100,7 +119,7 @@ resource "azurerm_template_deployment" "example" {
     {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2022-03-01",
-      "name": "[data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]]",
+      "name": "[parameters('vmName')]",
       "location": "[variables('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
@@ -111,9 +130,9 @@ resource "azurerm_template_deployment" "example" {
           "vmSize": "Standard_DS2_v2"
         },
         "osProfile": {
-          "computerName": "[data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]]",
-          "adminUsername": "[data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]]",
-          "adminPassword": "[data.azurerm_key_vault_secret.vm_credentials.value["adminPassword"]]"
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -141,4 +160,10 @@ resource "azurerm_template_deployment" "example" {
   "outputs": {}
 }
 TEMPLATE
+
+  parameters = {
+    adminUsername = data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]
+    adminPassword = data.azurerm_key_vault_secret.vm_credentials.value["adminPassword"]
+    vmName        = "your_vm_name"  # You can specify the VM name here
+  }
 }
