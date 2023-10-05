@@ -48,7 +48,7 @@ resource "azurerm_resource_group_template_deployment" "example" {
   deployment_mode     = "Incremental"
   parameters_content = jsonencode({
     adminUsername = "adminuser"
-    adminPassword = "P@ssw0rd123!"  # Store this secret in Jenkins or use another secure method
+    adminPassword = "adminuser"  # Store this secret in Jenkins or use another secure method
     subnetId = "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
   })
 template_content     = <<TEMPLATE
