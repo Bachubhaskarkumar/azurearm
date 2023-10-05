@@ -120,16 +120,6 @@ resource "azurerm_template_deployment" "example" {
 }
 TEMPLATE
 
-  parameter {
-    name  = "adminUsername"
-    value = "adminuser"
-  }
-  parameter {
-    name  = "adminPassword"
-    value = "P@ssw0rd123!"  # Store this secret in Jenkins or use another secure method
-  }
-}
-
 # Output the public IP address of the VM
 output "public_ip" {
   value = azurerm_template_deployment.example.outputs["adminUsername"]
