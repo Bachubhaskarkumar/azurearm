@@ -53,7 +53,7 @@ resource "azurerm_resource_group_template_deployment" "example" {
   })
 template_content     = <<TEMPLATE
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "adminUsername": {
@@ -138,7 +138,6 @@ template_content     = <<TEMPLATE
     }
   }
 }
-#DEPLOY
 TEMPLATE
 }
 # Output the public IP address of the VM
