@@ -1,4 +1,5 @@
 data "azurerm_client_config" "current" {}
+
 provider "azurerm" {
   features {}
 }
@@ -19,15 +20,27 @@ resource "azurerm_key_vault" "example" {
   enabled_for_disk_encryption = true
   enabled_for_template_deployment = true
   enabled_for_deployment       = true
+
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
     object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "get",
+      "list",
+      "set",
+      "delete",
+      "recover",
+      "purge",
+    ]
+
     secret_permissions = [
-      "Get",
-      "Set",
-      "Delete",
-      "Recover",
-      "Purge"
+      "get",
+      "list",
+      "set",
+      "delete",
+      "recover",
+      "purge",
     ]
   }
 }
@@ -40,26 +53,25 @@ resource "azurerm_key_vault_secret" "sp_credentials" {
 }
 
 # Define your virtual machine configuration using ARM templates
-#resource "azurerm_template_deployment" "example" {
 resource "azurerm_resource_group_template_deployment" "example" {
   name                = "bhaskar-deployment"
   resource_group_name = azurerm_resource_group.example.name
-  #template_content    = file("arm-template.json")  # Path to your ARM template file
   deployment_mode     = "Incremental"
-  parameters_content = jsonencode({
-  "adminUsername": {
-    "value": "adminuser"
-  },
-  "adminPassword": {
-    "value": "P@ssw0rd123!"
-  },
-  "subnetId": {
-    "value": "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
-  }
-})
-template_content     = <<TEMPLATE
+  parameters_content  = jsonencode({
+    "adminUsername" = {
+      "value" = "adminuser"
+    },
+    "adminPassword" = {
+      "value" = "P@ssw0rd123!"
+    },
+    "subnetId" = {
+      "value" = "/subscriptions/****/resourceGroups/mybhaskar/providers/Microsoft.Network/virtualNetworks/myNIC/subnets/mySubnet"
+    }
+  })
+
+  template_content = <<TEMPLATE
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "adminUsername": {
@@ -75,12 +87,12 @@ template_content     = <<TEMPLATE
       }
     },
     "subnetId": {
-        "type": "string",
-        "metadata": {
-            "description": "ID of the subnet."
-        }
+      "type": "string",
+      "metadata": {
+        "description": "ID of the subnet."
+      }
     }
-},
+  },
   "resources": [
     {
       "type": "Microsoft.Compute/virtualMachines",
@@ -132,7 +144,7 @@ template_content     = <<TEMPLATE
             "name": "myIPConfig",
             "properties": {
               "subnet": {
-                "id": "[variables('subnetId')]"
+                "id": "[parameters('subnetId')]"
               }
             }
           }
@@ -149,7 +161,8 @@ template_content     = <<TEMPLATE
 }
 TEMPLATE
 }
+
 # Output the public IP address of the VM
-output arm_example_output {
-  value = jsondecode(azurerm_resource_group_template_deployment.example.output_content).exampleOutput.value
+output "arm_example_output" {
+  value = jsondecode(azurerm_resource_group_template_deployment.example.output_content).outputs["adminUsername"]["value"]
 }
