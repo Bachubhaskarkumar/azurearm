@@ -157,7 +157,10 @@ resource "azurerm_template_deployment" "example" {
       }
     }
   ],
-  "outputs": {}
+#  "outputs": {}
+   "outputs": "vm_credentials_value" {
+    value = data.azurerm_key_vault_secret.vm_credentials.value
+}
 }
 TEMPLATE
 
