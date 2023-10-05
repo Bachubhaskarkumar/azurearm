@@ -119,7 +119,7 @@ resource "azurerm_template_deployment" "example" {
   }
 }
 TEMPLATE
-
+}
 # Output the public IP address of the VM
 output "public_ip" {
   value = azurerm_template_deployment.example.outputs["adminUsername"]
