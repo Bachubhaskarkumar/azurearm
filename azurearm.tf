@@ -33,6 +33,7 @@ resource "azurerm_template_deployment" "example" {
   name                = "example-deployment"
   resource_group_name = azurerm_resource_group.example.name
   template_content    = file("arm-template.json")  # Path to your ARM template file
+  deployment_mode     = "Incremental"
   parameter {
     name  = "adminUsername"
     value = "adminuser"
