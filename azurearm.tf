@@ -144,5 +144,6 @@ TEMPLATE
 }
 # Output the public IP address of the VM
 output "public_ip" {
-  value = azurerm_resource_group_template_deployment.example.outputs["adminUsername"]
+  #value = jsondecode(azurerm_resource_group_template_deployment.example.outputs)["adminUsername"]
+  value = jsondecode(azurerm_resource_group_template_deployment.example.public_ip).exampleOutput.value
 }
