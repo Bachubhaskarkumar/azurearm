@@ -11,7 +11,7 @@ resource "azurerm_resource_group" "example" {
 
 # Create an Azure Key Vault to store secrets
 resource "azurerm_key_vault" "example" {
-  name                       = "bhaskar"
+  name                       = "mybhaskar"
   location                   = azurerm_resource_group.example.location
   resource_group_name        = azurerm_resource_group.example.name
   sku_name                   = "standard"
