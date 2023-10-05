@@ -134,9 +134,9 @@ resource "azurerm_template_deployment" "example" {
           "vmSize": "Standard_DS2_v2"
         },
         "osProfile": {
-          "computerName": "[parameters('vmName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "computerName": bhaskar
+          "adminUsername": admin
+          "adminPassword": "[parameters('secret')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -162,15 +162,13 @@ resource "azurerm_template_deployment" "example" {
     }
   ],
 #  "outputs": {}
-   "outputs": "vm_credentials_value" {
-    value = data.azurerm_key_vault_secret.vm_credentials.value
-}
+ 
 }
 TEMPLATE
 
-  parameters = {
-    adminUsername = data.azurerm_key_vault_secret.vm_credentials.value["adminUsername"]
-    adminPassword = data.azurerm_key_vault_secret.vm_credentials.value["adminPassword"]
-    vmName        = "your_vm_name"  # You can specify the VM name here
-  }
+parameters_content = jsondecode({
+    "secret" = {
+        value = azurerm_key_vault_secret.secret.value
+        }
+  })
 }
